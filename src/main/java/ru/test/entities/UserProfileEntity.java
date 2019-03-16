@@ -1,10 +1,16 @@
 package ru.test.entities;
 
+import ru.test.entities.api.IUser;
+
 import javax.persistence.*;
 
+/**
+ * ORM Сущность пользовательского профиля
+ */
 @Entity
 @Table(name = "users")
-public class UserProfile {
+public class UserProfileEntity implements IUser {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,27 +22,25 @@ public class UserProfile {
     @Column(name = "password", unique = true, updatable = false)
     private String password;
 
-    public UserProfile() {
+    public UserProfileEntity() {
     }
 
-    public UserProfile(String login, String pass) {
+    public UserProfileEntity(String login, String pass) {
         this.login = login;
         this.password = pass;
     }
 
-    public UserProfile(String login) {
-        this.login = login;
-        this.password = login;
-    }
-
+    @Override
     public String getLogin() {
         return login;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

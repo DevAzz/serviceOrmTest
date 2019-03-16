@@ -14,8 +14,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>10</maven.compiler.source>
+    <maven.compiler.target>10</maven.compiler.target>
     <org.hibernate.hibernate-core.version>5.4.1.Final</org.hibernate.hibernate-core.version>
     <com.h2database.h2.version>1.4.198</com.h2database.h2.version>
   </properties>
@@ -32,6 +32,12 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
       <version>9.3.0.M0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-servlet</artifactId>
+      <version>9.4.15.v20190215</version>
     </dependency>
 
     <dependency>
@@ -78,7 +84,7 @@
           <appendAssemblyId>false</appendAssemblyId>
           <archive>
             <manifest>
-              <mainClass>ru.test.authorization.Main</mainClass>
+              <mainClass>ru.test.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

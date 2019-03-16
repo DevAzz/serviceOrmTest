@@ -1,9 +1,9 @@
 package ru.test.servlets;
 
-import ru.test.entities.UserProfile;
+import ru.test.entities.api.IUser;
 import ru.test.exceptions.DBException;
-import ru.test.services.DBService;
-import ru.test.services.UsersDAO;
+import ru.test.services.api.IDBService;
+import ru.test.utils.ContextService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,9 +13,9 @@ import java.io.IOException;
 
 public class SignInServlet extends HttpServlet {
 
-    private final DBService dbService;
+    private final IDBService dbService;
 
-    public SignInServlet(DBService dbService) {this.dbService = dbService;}
+    public SignInServlet() {this.dbService = ContextService.getInstance().getService(IDBService.class);}
 
 
     public void doGet(HttpServletRequest request,
@@ -35,7 +35,7 @@ public class SignInServlet extends HttpServlet {
                 return;
             }
 
-            UserProfile profile = dbService.getUserByLogin(login);
+            IUser profile = dbService.getUserByLogin(login);
             String responseText = "";
             if (null == profile) {
                 responseText = "Status code (401)\n" +

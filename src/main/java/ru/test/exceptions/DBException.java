@@ -1,14 +1,11 @@
 package ru.test.exceptions;
 
 /**
- * @author v.chibrikov
- *         <p>
- *         Пример кода для курса на https://stepic.org/
- *         <p>
- *         Описание курса и лицензия: https://github.com/vitaly-chibrikov/stepic_java_webserver
+ * Базовое исключение работы с БД
+ *
  */
-public class DBException extends Exception {
-    public DBException(Throwable throwable) {
-        super(throwable);
+public class DBException extends BaseExeption {
+    public DBException(Throwable cause) {
+        super(cause);
     }
 }

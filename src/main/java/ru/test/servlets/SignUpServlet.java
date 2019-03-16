@@ -1,7 +1,8 @@
 package ru.test.servlets;
 
-import ru.test.exceptions.DBException;
-import ru.test.services.DBService;
+import ru.test.exceptions.AccountException;
+import ru.test.services.api.IAccountService;
+import ru.test.utils.ContextService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,9 +12,12 @@ import java.io.IOException;
 
 public class SignUpServlet extends HttpServlet {
 
-    private final DBService dbService;
+    private final IAccountService accountService;
 
-    public SignUpServlet(DBService usersDao) {this.dbService = usersDao;}
+    public SignUpServlet() {
+        this.accountService =
+            ContextService.getInstance().getService(IAccountService.class);
+    }
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
@@ -33,8 +37,8 @@ public class SignUpServlet extends HttpServlet {
                 return;
             }
 
-            if (null == dbService.getUserByLogin(login)) {
-                dbService.addUser(login, pass);
+            if (null == accountService.getUserByLogin(login)) {
+                accountService.addNewUser(login, pass);
                 responseText = "Status code (200)\n" +
                                "и текст страницы:\n" +
                                "User added: " + login;
@@ -46,7 +50,7 @@ public class SignUpServlet extends HttpServlet {
             resp.getWriter().println(responseText);
             resp.setContentType("text/html;charset=utf-8");
             resp.setStatus(HttpServletResponse.SC_OK);
-        } catch (DBException e) {
+        } catch (AccountException e) {
             e.printStackTrace();
             //TODO Логирование
         }
