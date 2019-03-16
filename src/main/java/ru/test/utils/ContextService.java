@@ -20,7 +20,7 @@ public class ContextService {
     }
 
     public void addService(Object service) {
-        serviceMap.put(service.getClass().getSuperclass(), service);
+        serviceMap.put(service.getClass().getInterfaces()[0], service);
     }
 
     public <T> T getService(Class<T> aServiceType) {

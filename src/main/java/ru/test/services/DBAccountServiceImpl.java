@@ -14,17 +14,14 @@ public class DBAccountServiceImpl implements IAccountService {
 
     private final Map<String, IUser> sessionIdToProfile;
 
-    private final IDBService dbService;
-
     public DBAccountServiceImpl() {
         sessionIdToProfile = new HashMap<>();
-        this.dbService = ContextService.getInstance().getService(IDBService.class);
     }
 
     @Override
     public void addNewUser(String login, String passowrd) throws AccountException {
         try {
-            dbService.addUser(login, passowrd);
+            getDBService().addUser(login, passowrd);
         } catch (DBException e) {
             throw new AccountException(e);
         }
@@ -34,7 +31,7 @@ public class DBAccountServiceImpl implements IAccountService {
     public IUser getUserByLogin(String login) throws AccountException {
         IUser user = null;
         try {
-            user = dbService.getUserByLogin(login);
+            user = getDBService().getUserByLogin(login);
         } catch (DBException e) {
             throw new AccountException(e);
         }
@@ -55,4 +52,9 @@ public class DBAccountServiceImpl implements IAccountService {
     public void deleteSession(String sessionId) throws AccountException {
         sessionIdToProfile.remove(sessionId);
     }
+
+    private IDBService getDBService() {
+        return ContextService.getInstance().getService(IDBService.class);
+    }
+
 }

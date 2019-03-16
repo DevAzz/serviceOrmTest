@@ -1,51 +1,44 @@
 ﻿<html>
-<head>
-    <meta charset="UTF-8"/>
-    <title>L4.1: Jetty WebSocket Chat</title>
-    <script type="text/javascript">
-        var ws;
-
-        function init() {
-            ws = new WebSocket("ws://localhost:8080/chat");
-            ws.onopen = function (event) {
-
+    <head>
+        <meta charset="UTF-8">
+        <title>Вход</title>
+        <style>
+          .inner {
+            width: 300px;
+            margin: auto;
+          }
+        </style>
+        <script type= "text/javascript">
+            function signin()
+            {
+                document.location.href = "http://192.168.1.178/signin.html";
             }
-            ws.onmessage = function (event) {
-                var $textarea = document.getElementById("messages");
-                $textarea.value = $textarea.value + event.data + "\n";
+            function signup()
+            {
+                document.location.href = "http://192.168.1.178/signup.html"
             }
-            ws.onclose = function (event) {
+        </script>
+    </head>
+    <body>
+        <div id="body">
+            <div class="inner">
+                <p>
+                    Welcome to Chat!
+                </p>
+            </div>
 
-            }
-        };
-
-        function sendMessage() {
-            var messageField = document.getElementById("message");
-            var userNameField = document.getElementById("username");
-            var message = userNameField.value + ":" + messageField.value;
-            ws.send(message);
-            messageField.value = '';
-        }
-    </script>
-</head>
-<body onload="init();">
-<div id="body">
-    <div id="menu">
-        <p class="welcome">
-            Welcome, <input id="username" value="anonymous"/>
-        </p>
-
-        <div style="clear: both"></div>
-    </div>
-
-    <div id="chatbox">
-        <textarea id="messages" rows="20" cols="50" readonly="readonly"></textarea>
-    </div>
-
-    <form name="message" action="">
-        <input name="usermsg" type="text" id="message" size="40"/>
-        <input type="button" name="submitmsg" value="Send..." onclick="sendMessage();"/>
-    </form>
-</div>
-</body>
+            <div class="inner">
+                <p>
+                    <div>
+                        <input type="button" name="signin" value="Войти" onclick="signin();"/>
+                    </div>
+                </p>
+                <p>
+                    <div>
+                        <input type="button" name="signup" value="Зарегистрироваться" onclick="signup();"/>
+                    </div>
+                </p>
+            </div>
+        </div>
+    </body>
 </html>

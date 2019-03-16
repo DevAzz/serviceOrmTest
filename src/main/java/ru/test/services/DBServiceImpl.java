@@ -14,18 +14,11 @@ import javax.persistence.NoResultException;
  */
 public class DBServiceImpl implements IDBService {
 
-    /** Репоизиторий пользователей */
-    private final IUsersRepository repository;
-
-    public DBServiceImpl() {
-        repository = ContextService.getInstance().getService(IUsersRepository.class);
-    }
-
     @Override
     public IUser getUser(long id) throws DBException {
         IUser user = null;
         try {
-            user = repository.get(id);
+            user = getRepository().get(id);
         } catch (HibernateException e) {
             throw new DBException(e);
         }
@@ -36,7 +29,7 @@ public class DBServiceImpl implements IDBService {
     public long getUserId(String login) throws DBException {
         long id = 0L;
         try {
-            id = repository.getUserId(login);
+            id = getRepository().getUserId(login);
         } catch (HibernateException e) {
             throw new DBException(e);
         }
@@ -47,7 +40,7 @@ public class DBServiceImpl implements IDBService {
     public IUser getUserByLogin(String login) throws DBException {
         IUser user = null;
         try {
-            user = repository.getUserByLogin(login);
+            user = getRepository().getUserByLogin(login);
         } catch (Exception e) {
             if (!(e instanceof NoResultException)) {
                 throw new DBException(e);
@@ -60,11 +53,15 @@ public class DBServiceImpl implements IDBService {
     public Long addUser(String login, String password) throws DBException {
         Long id = null;
         try {
-            id = repository.addUser(login, password);
+            id = getRepository().addUser(login, password);
         } catch (HibernateException e) {
             throw new DBException(e);
         }
         return id;
+    }
+
+    private IUsersRepository getRepository() {
+        return ContextService.getInstance().getService(IUsersRepository.class);
     }
 
 }
