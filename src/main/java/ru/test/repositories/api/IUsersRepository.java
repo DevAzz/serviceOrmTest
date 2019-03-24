@@ -3,6 +3,8 @@ package ru.test.repositories.api;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.DBException;
 
+import java.util.List;
+
 /**
  * Контракт репозитория пользователей
  */
@@ -44,4 +46,11 @@ public interface IUsersRepository {
      * @throws DBException в случае ошибки
      */
     long addUser(String login, String password) throws DBException;
+
+    /**
+     * Возвращает список всех пользователей
+     * @return список всех пользователей
+     * @throws DBException в случае ошибки
+     */
+    List<IUser> getAllUsers() throws DBException;
 }

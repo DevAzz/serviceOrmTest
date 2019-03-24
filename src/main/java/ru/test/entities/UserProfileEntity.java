@@ -1,5 +1,7 @@
 package ru.test.entities;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ru.test.entities.api.IUser;
 
 import javax.persistence.*;
@@ -22,6 +24,8 @@ public class UserProfileEntity implements IUser {
     @Column(name = "password", unique = true, updatable = false)
     private String password;
 
+    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     public UserProfileEntity() {
     }
 
@@ -43,6 +47,11 @@ public class UserProfileEntity implements IUser {
     @Override
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public String getJSon() {
+        return GSON.toJson(this, UserProfileEntity.class);
     }
 
     @Override

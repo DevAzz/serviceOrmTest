@@ -8,6 +8,7 @@ import ru.test.services.api.IDBService;
 import ru.test.utils.ContextService;
 
 import javax.persistence.NoResultException;
+import java.util.List;
 
 /**
  * Реализация сервиса взаимодействия с БД на основе ORM
@@ -58,6 +59,17 @@ public class DBServiceImpl implements IDBService {
             throw new DBException(e);
         }
         return id;
+    }
+
+    @Override
+    public List<IUser> getAllUsers() throws DBException {
+        List<IUser> result = null;
+        try {
+            result = getRepository().getAllUsers();
+        } catch (HibernateException e) {
+            throw new DBException(e);
+        }
+        return result;
     }
 
     private IUsersRepository getRepository() {

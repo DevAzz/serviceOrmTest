@@ -7,14 +7,18 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import ru.test.exceptions.AccountException;
 import ru.test.services.ChatService;
+import ru.test.services.api.IAccountService;
+import ru.test.utils.ContextService;
 
 @WebSocket
 public class ChatWebSocket {
     private ChatService chatService;
     private Session session;
+    private IAccountService accountService;
 
     public ChatWebSocket(ChatService chatService) {
         this.chatService = chatService;
+        accountService = ContextService.getInstance().getService(IAccountService.class);
     }
 
     @OnWebSocketConnect

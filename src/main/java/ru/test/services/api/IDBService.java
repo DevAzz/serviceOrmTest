@@ -3,6 +3,8 @@ package ru.test.services.api;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.DBException;
 
+import java.util.List;
+
 /**
  * Контракт сервиса взаимодействия с БД
  */
@@ -44,5 +46,12 @@ public interface IDBService {
      * @throws DBException в случае ошибки
      */
     Long addUser(String login, String password) throws DBException;
+
+    /**
+     * Возвращает список всех пользователей
+     * @return список всех пользователей
+     * @throws DBException в случае ошибки
+     */
+    List<IUser> getAllUsers() throws DBException;
 
 }

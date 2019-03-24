@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * JDBC реализация репозитория пользователей
@@ -113,6 +114,11 @@ public class JDBCUsersRepositoryImpl implements IUsersRepository {
         }
         return result;
 
+    }
+
+    @Override
+    public List<IUser> getAllUsers() throws DBException {
+        return null;
     }
 
     /**

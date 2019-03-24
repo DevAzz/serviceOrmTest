@@ -21,6 +21,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * ORM реализация репозитория пользователей
@@ -101,6 +102,28 @@ public class ORMUsersRepositoryImpl implements IUsersRepository {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
             result = (Long) session.save(new UserProfileEntity(login, password));
+            transaction.commit();
+            session.close();
+        } catch (HibernateException e) {
+            throw new DBException(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<IUser> getAllUsers() throws DBException {
+        List<IUser> result = null;
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+            EntityManager em = session.getEntityManagerFactory().createEntityManager();
+            CriteriaBuilder builder = em.getCriteriaBuilder();
+            CriteriaQuery<UserProfileEntity> criteria =
+                    builder.createQuery(UserProfileEntity.class);
+            Root<UserProfileEntity> root = criteria.from(UserProfileEntity.class);
+            criteria.select(root);
+            result =
+                    (List<IUser>) em.createQuery(criteria ).getResultList().stream().map(IUser.class::cast);
             transaction.commit();
             session.close();
         } catch (HibernateException e) {

@@ -5,7 +5,9 @@ import ru.test.entities.api.IUser;
 import ru.test.exceptions.AccountException;
 import ru.test.services.api.IAccountService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +30,11 @@ public class HashMapAccountServiceImpl implements IAccountService {
     @Override
     public IUser getUserByLogin(String login) {
         return loginToProfile.get(login);
+    }
+
+    @Override
+    public List<IUser> getAllUsers() throws AccountException {
+        return new ArrayList<>(loginToProfile.values());
     }
 
     @Override

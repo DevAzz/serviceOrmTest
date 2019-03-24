@@ -8,6 +8,7 @@ import ru.test.services.api.IDBService;
 import ru.test.utils.ContextService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DBAccountServiceImpl implements IAccountService {
@@ -36,6 +37,17 @@ public class DBAccountServiceImpl implements IAccountService {
             throw new AccountException(e);
         }
         return user;
+    }
+
+    @Override
+    public List<IUser> getAllUsers() throws AccountException {
+        List<IUser> result = null;
+        try {
+            result = getDBService().getAllUsers();
+        } catch (DBException e) {
+            throw new AccountException(e);
+        }
+        return result;
     }
 
     @Override
