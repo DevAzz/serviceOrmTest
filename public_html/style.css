@@ -1,0 +1,94 @@
+body {
+    background: #f5f5f5;
+    color: #000000;
+    font-family: Arial, Times New Roman;
+    font-size: 16px;
+}
+
+#container {
+    width: 99%;
+    height: 99%;
+}
+
+#menu {
+    background: white;
+    float: left;
+    width: 30%;
+    height: 100%;
+}
+
+#content {
+    background: whitesmoke;
+    float: right;
+    width: 70%;
+    height: 100%;
+}
+
+#clear {
+    clear:both;
+}
+
+.messageHead {
+    margin: 1%;
+    hyphens: auto;
+    float: top;
+    padding-bottom: 2%;
+
+}
+.messageHeadTime {
+    float: left;
+}
+
+.messageHeadUserName {
+    float: right;
+}
+
+.messageValue {
+    margin: 1%;
+    word-wrap: break-word;
+    float: bottom;
+    width: 97%;
+}
+
+.messageBox {
+    border: 2px solid black; /* Параметры границы */
+    background: aliceblue; /* Цвет фона */
+    display: inline-block;
+    margin: 1%;
+    hyphens: auto;
+    width: 97%;
+}
+
+.messageBlock {
+    height: 70%;
+    width: 100%;
+    float: top;
+    overflow: auto;
+}
+
+.messageInput{
+    height: 30%;
+    width: 100%;
+    margin: 1%;
+    border: 2px solid black;
+    float: bottom;
+}
+
+.messageForm {
+    color: black;
+}
+
+.messageInputTextArea {
+    margin: 5px;
+    height: 60%;
+    width: 99%;
+    float: top;
+}
+
+.messageInputSend {
+    margin: 5px;
+    height: 10%;
+    width: 15%;
+    float: bottom;
+}
+

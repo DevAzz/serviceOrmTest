@@ -2,44 +2,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat!</title>
-    <style>
-          .inner {
-            width: 300px;
-            margin: auto;
-          }
-
-        .headMessage {
-            width: 300px;
-            margin: auto;
-            padding: 5px;
-            hyphens: auto;
-        }
-
-        .messageValue {
-            width: 300px;
-            margin: auto;
-            padding: 5px;
-            color: black;
-            hyphens: auto;
-        }
-
-        .messageBox {
-            border: 2px solid black; /* Параметры границы */
-            background: aliceblue; /* Цвет фона */
-            display: inline-block;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-
-        .sendButton {
-            margin-top: 5px;
-        }
-
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <script src="moment.js"></script>
     <script type="text/javascript">
         var ws;
+        document.addEventListener('keydown', enterSendMessage);
         function init() {
             ws = new WebSocket("ws://192.168.1.178:80/chat");
             userNameField = "${username}";
@@ -57,19 +24,38 @@
 
         function sendMessage() {
             var messageField = document.getElementById("message");
-            var message = userNameField + ":" + messageField.value;
-            ws.send(message);
-            messageField.value = '';
+            if(0 != messageField.value.length) {
+                var message = messageField.value;
+                ws.send(message);
+                messageField.value = '';
+            }
+            return false;
+        }
+
+        function enterSendMessage(event) {
+            if ((event.keyCode == 10 || event.keyCode == 13) && event.ctrlKey) {
+                sendMessage();
+                return true;
+            }
+            return false;
         }
 
         function showMessage(message, messageHeadValue) {
-            var blockWidth = 300;
             var messageBox = document.createElement('div');
             messageBox.classList.add('messageBox')
 
             var messageHead = document.createElement('div');
-            messageHead.classList.add('headMessage');
-            messageHead.appendChild(document.createTextNode(messageHeadValue));
+            messageHead.classList.add('messageHead');
+
+            var messageHeadTime = document.createElement('div');
+            messageHeadTime.classList.add('messageHeadTime');
+            messageHeadTime.appendChild(document.createTextNode(messageHeadValue));
+
+            var messageUser = document.createElement('div');
+            messageUser.classList.add('messageHeadUserName');
+            messageUser.appendChild(document.createTextNode(userNameField));
+
+            messageHead.append(messageHeadTime, messageUser);
 
             messageBox.appendChild(messageHead);
 
@@ -80,26 +66,32 @@
             messageBox.appendChild(messageElem);
 
             document.getElementById('chatbox').appendChild(messageBox);
-        }
 
+            messageBox.scrollIntoView();
+        }
     </script>
 </head>
     <body onload="init();">
-        <div id="body">
-                <div id="menu" class="inner">
-                    <div>
-                        Welcome, ${username}
-                    </div>
+    <div id="container">
+        <div id="menu">
+            <h2>Welcome, ${username}</h2>
+            <div id="users" class="usersBlock"></div>
+        </div>
 
-                    <div style="clear: both"></div>
-                </div>
-
-                <div id="chatbox" class="inner"></div>
-
-                <form name="message" action="" class="inner">
-                    <input name="usermsg" type="text" id="message" size="40"/>
-                    <input type="button" class="sendButton" name="submitmsg" value="Send" onclick="sendMessage();"/>
+        <div id="content">
+            <div id="messages" class="messageBlock">
+                <div id="chatbox"></div>
+            </div>
+            <div id="messageInput" class="messageInput">
+                <form name="messageForm" action="" class="messageForm" onsubmit="return sendMessage()">
+                    <textarea name="usermsg" id="message" class="messageInputTextArea" onkeypress="enterSendMessage()"></textarea>
+                    <input type="button" name="submitmsg" value="Send" class="messageInputSend" onclick="sendMessage()"/>
                 </form>
             </div>
+        </div>
+
+        <div id="clear"></div>
+    </div>
+
     </body>
 </html>
