@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Chat!</title>
@@ -8,7 +7,37 @@
             width: 300px;
             margin: auto;
           }
+
+        .headMessage {
+            width: 300px;
+            margin: auto;
+            padding: 5px;
+            hyphens: auto;
+        }
+
+        .messageValue {
+            width: 300px;
+            margin: auto;
+            padding: 5px;
+            color: black;
+            hyphens: auto;
+        }
+
+        .messageBox {
+            border: 2px solid black; /* Параметры границы */
+            background: aliceblue; /* Цвет фона */
+            display: inline-block;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .sendButton {
+            margin-top: 5px;
+        }
+
+
     </style>
+    <script src="moment.js"></script>
     <script type="text/javascript">
         var ws;
         function init() {
@@ -17,8 +46,9 @@
             ws.onopen = function (event) {
             }
             ws.onmessage = function (event) {
-                var $textarea = document.getElementById("messages");
-                $textarea.value = $textarea.value + event.data + "\n";
+                var now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
+                var messageHead = now + "\n";
+                showMessage(event.data, messageHead)
             }
             ws.onclose = function (event) {
 
@@ -31,28 +61,45 @@
             ws.send(message);
             messageField.value = '';
         }
+
+        function showMessage(message, messageHeadValue) {
+            var blockWidth = 300;
+            var messageBox = document.createElement('div');
+            messageBox.classList.add('messageBox')
+
+            var messageHead = document.createElement('div');
+            messageHead.classList.add('headMessage');
+            messageHead.appendChild(document.createTextNode(messageHeadValue));
+
+            messageBox.appendChild(messageHead);
+
+            var messageElem = document.createElement('div');
+            messageElem.classList.add('messageValue');
+            messageElem.appendChild(document.createTextNode(message));
+
+            messageBox.appendChild(messageElem);
+
+            document.getElementById('chatbox').appendChild(messageBox);
+        }
+
     </script>
 </head>
     <body onload="init();">
         <div id="body">
-            <div class="inner">
-                <div id="menu">
-                    <p class="welcome">
+                <div id="menu" class="inner">
+                    <div>
                         Welcome, ${username}
-                    </p>
+                    </div>
 
                     <div style="clear: both"></div>
                 </div>
 
-                <div id="chatbox">
-                    <textarea id="messages" rows="20" cols="50" readonly="readonly"></textarea>
-                </div>
+                <div id="chatbox" class="inner"></div>
 
-                <form name="message" action="">
+                <form name="message" action="" class="inner">
                     <input name="usermsg" type="text" id="message" size="40"/>
-                    <input type="button" name="submitmsg" value="Send..." onclick="sendMessage();"/>
+                    <input type="button" class="sendButton" name="submitmsg" value="Send" onclick="sendMessage();"/>
                 </form>
             </div>
-        </div>
     </body>
 </html>
