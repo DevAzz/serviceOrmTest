@@ -46,13 +46,15 @@ public class SignUpServlet extends HttpServlet {
                 responseText = "Status code (200)\n" +
                                "и текст страницы:\n" +
                                "User added: " + login;
+                pageVariables.put("username", login);
+                resp.getWriter().println(
+                        PageGenerator.instance().getPage("chat.html", pageVariables));
             } else {
                 responseText = "Status code (200)\n" +
                                "и текст страницы:\n" +
                                "User already exist: " + login;
             }
-            resp.getWriter().println(
-                    PageGenerator.instance().getPage("chat.html", pageVariables));
+
         } catch (AccountException e) {
             e.printStackTrace();
             //TODO Логирование

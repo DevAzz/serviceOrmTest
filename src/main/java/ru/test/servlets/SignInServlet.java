@@ -29,18 +29,23 @@ public class SignInServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            String responseText = "";
             Map<String, Object> pageVariables = createPageVariablesMap(req);
             String login = req.getParameter("login");
             String pass = req.getParameter("pass");
 
-            if (login == null || pass == null) {
+            if ((login == null || login.isEmpty()) || (pass == null || pass.isEmpty())) {
+                responseText = "Status code (401)\n" +
+                               "текст страницы:\n" +
+                               "Unauthorized";
                 resp.setContentType("text/html;charset=utf-8");
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().println(responseText);
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
             IUser profile = accountService.getUserByLogin(login);
-            String responseText = "";
+
             if (null == profile) {
                 responseText = "Status code (401)\n" +
                                "текст страницы:\n" +
@@ -49,8 +54,20 @@ public class SignInServlet extends HttpServlet {
                 resp.getWriter().println(responseText);
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
-                resp.getWriter().println(
+                if (profile.getPassword().equals(pass)) {
+                    accountService.addSession(req.getSession().getId(), profile);
+                    pageVariables.put("username", login);
+                    resp.getWriter().println(
                         PageGenerator.instance().getPage("chat.html", pageVariables));
+
+                } else {
+                    responseText = "Status code (401)\n" +
+                                   "текст страницы:\n" +
+                                   "Unauthorized";
+                    resp.setContentType("text/html;charset=utf-8");
+                    resp.getWriter().println(responseText);
+                    resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
             }
 
         } catch (AccountException e) {

@@ -5,6 +5,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import ru.test.exceptions.AccountException;
 import ru.test.services.ChatService;
 
 @WebSocket
@@ -17,7 +18,7 @@ public class ChatWebSocket {
     }
 
     @OnWebSocketConnect
-    public void onOpen(Session session) {
+    public void onOpen(Session session) throws AccountException {
         chatService.add(this);
         this.session = session;
     }

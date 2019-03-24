@@ -2,14 +2,19 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Тестовый чат</title>
+    <title>Chat!</title>
+    <style>
+          .inner {
+            width: 300px;
+            margin: auto;
+          }
+    </style>
     <script type="text/javascript">
         var ws;
-
         function init() {
             ws = new WebSocket("ws://192.168.1.178:80/chat");
+            userNameField = "${username}";
             ws.onopen = function (event) {
-
             }
             ws.onmessage = function (event) {
                 var $textarea = document.getElementById("messages");
@@ -22,8 +27,7 @@
 
         function sendMessage() {
             var messageField = document.getElementById("message");
-            var userNameField = document.getElementById("username");
-            var message = userNameField.value + ":" + messageField.value;
+            var message = userNameField + ":" + messageField.value;
             ws.send(message);
             messageField.value = '';
         }
@@ -31,22 +35,24 @@
 </head>
     <body onload="init();">
         <div id="body">
-            <div id="menu">
-                <p class="welcome">
-                    Welcome, <input id="username" value="anonymous"/>
-                </p>
+            <div class="inner">
+                <div id="menu">
+                    <p class="welcome">
+                        Welcome, ${username}
+                    </p>
 
-                <div style="clear: both"></div>
+                    <div style="clear: both"></div>
+                </div>
+
+                <div id="chatbox">
+                    <textarea id="messages" rows="20" cols="50" readonly="readonly"></textarea>
+                </div>
+
+                <form name="message" action="">
+                    <input name="usermsg" type="text" id="message" size="40"/>
+                    <input type="button" name="submitmsg" value="Send..." onclick="sendMessage();"/>
+                </form>
             </div>
-
-            <div id="chatbox">
-                <textarea id="messages" rows="20" cols="50" readonly="readonly"></textarea>
-            </div>
-
-            <form name="message" action="">
-                <input name="usermsg" type="text" id="message" size="40"/>
-                <input type="button" name="submitmsg" value="Send..." onclick="sendMessage();"/>
-            </form>
         </div>
     </body>
 </html>
