@@ -7,6 +7,4 @@ public interface IUser {
     String getPassword();
 
     Long getId();
-
-    String getJSon();
 }

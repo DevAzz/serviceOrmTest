@@ -1,7 +1,5 @@
 package ru.test.entities;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import ru.test.entities.api.IUser;
 
 /**
@@ -14,8 +12,6 @@ public class UserProfileBase implements IUser {
     private String login;
 
     private String password;
-
-    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public UserProfileBase() {
     }
@@ -34,11 +30,6 @@ public class UserProfileBase implements IUser {
     @Override
     public Long getId() {
         return id;
-    }
-
-    @Override
-    public String getJSon() {
-        return GSON.toJson(this, UserProfileEntity.class);
     }
 
     @Override

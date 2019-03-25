@@ -22,13 +22,16 @@ import javax.persistence.criteria.Root;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ORM реализация репозитория пользователей
  */
 public class ORMUsersRepositoryImpl implements IUsersRepository {
 
-    /** Фабрика сессий */
+    /**
+     * Фабрика сессий
+     */
     private final SessionFactory sessionFactory;
 
     public ORMUsersRepositoryImpl() {
@@ -44,7 +47,7 @@ public class ORMUsersRepositoryImpl implements IUsersRepository {
             user = session.get(UserProfileEntity.class, id);
             transaction.commit();
             session.close();
-        } catch(HibernateException e) {
+        } catch (HibernateException e) {
             throw new DBException(e);
         }
         return user;
@@ -64,7 +67,7 @@ public class ORMUsersRepositoryImpl implements IUsersRepository {
             Root<UserProfileEntity> root = criteria.from(UserProfileEntity.class);
             criteria.select(root);
             criteria.where(builder.equal(root.get(UserProfileEntity_.login), login));
-            result = em.createQuery( criteria ).getSingleResult().getId();
+            result = em.createQuery(criteria).getSingleResult().getId();
             transaction.commit();
             session.close();
         } catch (HibernateException e) {
@@ -86,7 +89,7 @@ public class ORMUsersRepositoryImpl implements IUsersRepository {
             Root<UserProfileEntity> root = criteria.from(UserProfileEntity.class);
             criteria.select(root);
             criteria.where(builder.equal(root.get(UserProfileEntity_.login), login));
-            user = em.createQuery( criteria ).getSingleResult();
+            user = em.createQuery(criteria).getSingleResult();
             transaction.commit();
             session.close();
         } catch (HibernateException e) {
@@ -122,8 +125,9 @@ public class ORMUsersRepositoryImpl implements IUsersRepository {
                     builder.createQuery(UserProfileEntity.class);
             Root<UserProfileEntity> root = criteria.from(UserProfileEntity.class);
             criteria.select(root);
-            result =
-                    (List<IUser>) em.createQuery(criteria ).getResultList().stream().map(IUser.class::cast);
+            result = em.createQuery(criteria).getResultList().stream().map(IUser.class::cast)
+                    .collect(
+                            Collectors.toList());
             transaction.commit();
             session.close();
         } catch (HibernateException e) {
@@ -138,7 +142,8 @@ public class ORMUsersRepositoryImpl implements IUsersRepository {
                     getSessionFactoryOptions().getServiceRegistry().
                     getService(ConnectionProvider.class).getConnection();
             System.out.println("DB name: " + connection.getMetaData().getDatabaseProductName());
-            System.out.println("DB version: " + connection.getMetaData().getDatabaseProductVersion());
+            System.out
+                    .println("DB version: " + connection.getMetaData().getDatabaseProductVersion());
             System.out.println("Driver: " + connection.getMetaData().getDriverName());
             System.out.println("Autocommit: " + connection.getAutoCommit());
         } catch (SQLException e) {

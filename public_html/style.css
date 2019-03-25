@@ -13,14 +13,14 @@ body {
 #menu {
     background: white;
     float: left;
-    width: 30%;
+    width: 20%;
     height: 100%;
 }
 
 #content {
     background: whitesmoke;
     float: right;
-    width: 70%;
+    width: 80%;
     height: 100%;
 }
 
@@ -60,14 +60,14 @@ body {
 }
 
 .messageBlock {
-    height: 70%;
+    height: 78%;
     width: 100%;
     float: top;
     overflow: auto;
 }
 
 .messageInput{
-    height: 30%;
+    height: 20%;
     width: 100%;
     margin: 1%;
     border: 2px solid black;
@@ -80,15 +80,33 @@ body {
 
 .messageInputTextArea {
     margin: 5px;
-    height: 60%;
+    height: 70%;
     width: 99%;
     float: top;
 }
 
 .messageInputSend {
     margin: 5px;
-    height: 10%;
+    height: 13%;
     width: 15%;
     float: bottom;
+}
+
+.formatBox {
+    white-space: pre-wrap;
+
+}
+
+.usersBox {
+    border: 2px solid black; /* Параметры границы */
+    background: aliceblue; /* Цвет фона */
+    margin: 2%;
+    word-wrap: break-word;
+    width: 80%;
+}
+
+.usersBlock {
+    width: 100%;
+    height: 100%;
 }
 

@@ -1,20 +1,27 @@
 package ru.test.sockets;
 
+import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import ru.test.entities.api.IUser;
 import ru.test.exceptions.AccountException;
 import ru.test.services.ChatService;
 import ru.test.services.api.IAccountService;
 import ru.test.utils.ContextService;
+import ru.test.utils.MessageType;
+
+import javax.servlet.http.HttpSession;
+import java.util.stream.Collectors;
 
 @WebSocket
 public class ChatWebSocket {
     private ChatService chatService;
     private Session session;
     private IAccountService accountService;
+    private IUser user = null;
 
     public ChatWebSocket(ChatService chatService) {
         this.chatService = chatService;
@@ -25,6 +32,13 @@ public class ChatWebSocket {
     public void onOpen(Session session) throws AccountException {
         chatService.add(this);
         this.session = session;
+        HttpSession httpSession = (HttpSession) session.getUpgradeRequest().getSession();
+        user = accountService.getUserBySessionId(httpSession.getId());
+        String jsonUsers = accountService.getAllUsers().stream()
+                        .map(user -> new GsonBuilder().create()
+                                .toJson(user)).collect(
+                        Collectors.joining(", "));
+       sendString(MessageType.USER_LIST.getName() + "[" + jsonUsers + "]");
     }
 
     @OnWebSocketMessage

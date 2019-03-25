@@ -10,6 +10,7 @@ import ru.test.repositories.ORMUsersRepositoryImpl;
 import ru.test.services.DBAccountServiceImpl;
 import ru.test.services.DBServiceImpl;
 import ru.test.services.HashMapAccountServiceImpl;
+import ru.test.servlets.AccountsServlet;
 import ru.test.servlets.SignInServlet;
 import ru.test.servlets.SignUpServlet;
 import ru.test.servlets.WebSocketChatServlet;
@@ -33,6 +34,8 @@ public class Main {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.addServlet(new ServletHolder(new SignInServlet()), "/signin");
         context.addServlet(new ServletHolder(new SignUpServlet()), "/signup");
+        context.addServlet(new ServletHolder(new AccountsServlet()), "/account");
+
         if (useChat) {
             context.addServlet(new ServletHolder(new WebSocketChatServlet()), "/chat");
         }
