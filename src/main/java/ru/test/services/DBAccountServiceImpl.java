@@ -65,6 +65,11 @@ public class DBAccountServiceImpl implements IAccountService {
         sessionIdToProfile.remove(sessionId);
     }
 
+    @Override
+    public Boolean isUserOnline(IUser user) {
+        return sessionIdToProfile.containsValue(user);
+    }
+
     private IDBService getDBService() {
         return ContextService.getInstance().getService(IDBService.class);
     }

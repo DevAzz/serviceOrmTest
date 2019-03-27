@@ -47,6 +47,7 @@ public class SignUpServlet extends HttpServlet {
                                "и текст страницы:\n" +
                                "User added: " + login;
                 pageVariables.put("username", login);
+
                 resp.getWriter().println(
                         PageGenerator.instance().getPage("chat.html", pageVariables));
             } else {

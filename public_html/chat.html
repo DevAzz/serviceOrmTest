@@ -4,13 +4,18 @@
     <title>Chat!</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
     <script src="moment.js"></script>
-    <script type="text/javascript">
+    <script type="text/javascript" language="JavaScript1.8">
         var ws;
-        var arrUsers;
-        var currentUserArr;
-        window.addEventListener('load', function(event) {
+        var username = "${username}";
+        var arrUsers = [];
+
+        window.onbeforeunload = function () {
+            ws.close();
+        };
+
+        window.addEventListener('load', function (event) {
             var textArea = document.querySelectorAll(".messageInputTextArea");
-            [].forEach.call(textArea,function(el){
+            [].forEach.call(textArea, function (el) {
                 el.addEventListener('keydown', function (e) {
                     if ((e.keyCode === 10 || e.keyCode === 13) && e.ctrlKey) {
                         sendMessage();
@@ -24,8 +29,8 @@
 
                         // set textarea value to: text before caret + tab + text after caret
                         target.value = value.substring(0, start)
-                            + "\t"
-                            + value.substring(end);
+                                + "\t"
+                                + value.substring(end);
 
                         // put caret at right position again (add one for the tab)
                         this.selectionStart = this.selectionEnd = start + 1;
@@ -40,53 +45,117 @@
         function init() {
             ws = new WebSocket("ws://192.168.1.178:80/chat");
             ws.onopen = function (event) {
-                var x = new XMLHttpRequest();
-                x.open("GET", "/account", true);
-                x.onload = function () {
-                    currentUserArr = parseJson(x.responseText);
-                    var title = document.getElementById('title');
-                    title.innerHTML = 'Welcome, ' + currentUserArr[0].login + '!';
+                var getCurrentUserRequest = new XMLHttpRequest();
+                getCurrentUserRequest.open("GET", "/account", true);
+                getCurrentUserRequest.onload = function () {
+                    arrUsers = parseJson(getCurrentUserRequest.responseText);
+                    var usersBlock = document.getElementById("users");
+                    usersBlock.innerHTML = '';
+                    arrUsers.forEach(function (item, i, arr) {
+                        if (username !== item.login) {
+                            showUser(item.login, item.online);
+                        }
+                    });
                 };
-                x.send(null);
+                getCurrentUserRequest.send(null);
+
             };
             ws.onmessage = function (event) {
                 var now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
                 var messageHead = now + "\n";
                 if (event.data.indexOf('USER_LIST') + 1) {
-                    arrUsers = parseJson(event.data.substring(9, event.data.length));
+                    var changeUsers = parseJson(event.data.substring(9, event.data.length));
+                    changeUsers.forEach(function (item, i, arr) {
+                        if (username !== item.login) {
+                            if (containsUser(item)) {
+                                arrUsers[getUserIndex(item)] = item;
+                            } else {
+                                arrUsers.push(item);
+                            }
+                        }
+                    });
+                    var usersBlock = document.getElementById("users");
+                    usersBlock.innerHTML = '';
                     arrUsers.forEach(function (item, i, arr) {
-                        showUsers(item.login);
+                        if (username !== item.login) {
+                            showUser(item.login, item.online);
+                        }
                     });
                 } else {
+                    var usersBlock = document.getElementById("users");
+                    usersBlock.innerHTML = '';
                     showMessage(event.data.substring(event.data.indexOf(':') + 1),
-                        messageHead, event.data.substring(0, event.data.indexOf(':')));
+                            messageHead, event.data.substring(0, event.data.indexOf(':')));
                 }
-                ;
 
             };
             ws.onclose = function (event) {
-
+                var postUserOnline = new XMLHttpRequest();
+                postUserOnline.open("DELETE", "/account", true);
+                postUserOnline.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+                postUserOnline.send();
             }
+        }
+
+        function containsUser(user) {
+            var result = false;
+            var BreakException = {};
+            try {
+                arrUsers.forEach(function (item, i, arr) {
+                    if (item.login === user.login) {
+                        result = true;
+                        throw BreakException;
+                    }
+                });
+            } catch (e) {
+                if (e !== BreakException) throw e;
+            }
+            return result;
+        }
+
+        function getUserIndex(user) {
+            var result = -1;
+            var BreakException = {};
+            try {
+                arrUsers.forEach(function (item, i, arr) {
+                    if (item.login === user.login) {
+                        result = arrUsers.indexOf(item);
+                        throw BreakException;
+                    }
+                });
+            } catch (e) {
+                if (e !== BreakException) throw e;
+            }
+            return result;
         }
 
         function parseJson(json) {
             var string = json.replace(/\\n/g, "\\n")
-                .replace(/\\'/g, "\\'")
-                .replace(/\\"/g, '\\"')
-                .replace(/\\&/g, "\\&")
-                .replace(/\\r/g, "\\r")
-                .replace(/\\t/g, "\\t")
-                .replace(/\\b/g, "\\b")
-                .replace(/\\f/g, "\\f");
+                    .replace(/\\'/g, "\\'")
+                    .replace(/\\"/g, '\\"')
+                    .replace(/\\&/g, "\\&")
+                    .replace(/\\r/g, "\\r")
+                    .replace(/\\t/g, "\\t")
+                    .replace(/\\b/g, "\\b")
+                    .replace(/\\f/g, "\\f");
             string = json.replace(/[\u0000-\u0019]+/g, "");
             return JSON.parse(string);
         }
 
-        function showUsers(userJson) {
+        function showUser(userName, userOnline) {
             var usersBlock = document.getElementById("users");
             var userBox = document.createElement('div');
             userBox.classList.add('usersBox');
-            userBox.appendChild(document.createTextNode(userJson));
+
+            var userBoxName = document.createElement('div');
+            userBoxName.classList.add("usersBoxName");
+            userBoxName.appendChild(document.createTextNode(userName));
+
+            var userBoxOnline = document.createElement('div');
+            userBoxOnline.classList.add("usersBoxName");
+            userBoxOnline.appendChild(document.createTextNode(userOnline));
+
+            userBox.append(userBoxName, userBoxOnline);
             usersBlock.appendChild(userBox);
 
         }
@@ -94,7 +163,7 @@
         function sendMessage() {
             var messageField = document.getElementById("message");
             if (0 !== messageField.value.length) {
-                var message = currentUserArr[0].login + ":" + messageField.value;
+                var message = username + ":" + messageField.value;
                 ws.send(message);
                 messageField.value = '';
             }
@@ -138,7 +207,7 @@
 <body onload="init();">
 <div id="container">
     <div id="menu">
-        <h2 id="title"></h2>
+        <h2 id="title">Welcome, ${username}!</h2>
         <div id="users" class="usersBlock"></div>
     </div>
 

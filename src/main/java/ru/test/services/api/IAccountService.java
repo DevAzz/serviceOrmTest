@@ -23,4 +23,6 @@ public interface IAccountService {
     void addSession(String sessionId, IUser userProfileEntity) throws AccountException;
 
     void deleteSession(String sessionId) throws AccountException;
+
+    Boolean isUserOnline(IUser user);
 }

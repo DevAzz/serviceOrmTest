@@ -6,10 +6,11 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import ru.test.entities.ChatUser;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.AccountException;
-import ru.test.services.ChatService;
 import ru.test.services.api.IAccountService;
+import ru.test.services.api.IChatService;
 import ru.test.utils.ContextService;
 import ru.test.utils.MessageType;
 
@@ -18,13 +19,13 @@ import java.util.stream.Collectors;
 
 @WebSocket
 public class ChatWebSocket {
-    private ChatService chatService;
+    private IChatService chatService;
     private Session session;
     private IAccountService accountService;
-    private IUser user = null;
+    private IUser currentUser = null;
 
-    public ChatWebSocket(ChatService chatService) {
-        this.chatService = chatService;
+    public ChatWebSocket() {
+        this.chatService = ContextService.getInstance().getService(IChatService.class);
         accountService = ContextService.getInstance().getService(IAccountService.class);
     }
 
@@ -33,10 +34,17 @@ public class ChatWebSocket {
         chatService.add(this);
         this.session = session;
         HttpSession httpSession = (HttpSession) session.getUpgradeRequest().getSession();
-        user = accountService.getUserBySessionId(httpSession.getId());
+        currentUser = accountService.getUserBySessionId(httpSession.getId());
         String jsonUsers = accountService.getAllUsers().stream()
-                        .map(user -> new GsonBuilder().create()
-                                .toJson(user)).collect(
+                        .map(user -> {
+                            String result = "";
+                            if (user.getId() != currentUser.getId()) {
+                                result = new GsonBuilder().create()
+                                        .toJson(new ChatUser(user,
+                                                             accountService.isUserOnline(user)));
+                            }
+                            return result;
+                        }).collect(
                         Collectors.joining(", "));
        sendString(MessageType.USER_LIST.getName() + "[" + jsonUsers + "]");
     }
@@ -48,6 +56,7 @@ public class ChatWebSocket {
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
+        chatService.sendChangeUserStatusMessage(new ChatUser(currentUser, false));
         chatService.remove(this);
     }
 

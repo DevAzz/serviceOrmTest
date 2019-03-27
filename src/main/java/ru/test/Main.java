@@ -7,6 +7,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import ru.test.repositories.JDBCUsersRepositoryImpl;
 import ru.test.repositories.ORMUsersRepositoryImpl;
+import ru.test.services.ChatServiceImpl;
 import ru.test.services.DBAccountServiceImpl;
 import ru.test.services.DBServiceImpl;
 import ru.test.services.HashMapAccountServiceImpl;
@@ -32,7 +33,7 @@ public class Main {
         configServer();
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.addServlet(new ServletHolder(new SignInServlet()), "/signin");
+        context.addServlet(new ServletHolder(new SignInServlet(useChat)), "/signin");
         context.addServlet(new ServletHolder(new SignUpServlet()), "/signup");
         context.addServlet(new ServletHolder(new AccountsServlet()), "/account");
 
@@ -71,6 +72,9 @@ public class Main {
                     Boolean.parseBoolean(getPropertyValue(PropertiesType.USE_DB));
             useChat =
                     Boolean.parseBoolean(getPropertyValue(PropertiesType.USE_CHAT));
+            if (useChat) {
+                ContextService.getInstance().addService(new ChatServiceImpl());
+            }
             DBInteratcionType dbInteraction =
                     DBInteratcionType.valueOf(getPropertyValue(PropertiesType.DB_INTERACTION_TYPE));
             if (useDB) {

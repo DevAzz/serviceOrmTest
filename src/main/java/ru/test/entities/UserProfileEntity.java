@@ -3,6 +3,7 @@ package ru.test.entities;
 import ru.test.entities.api.IUser;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * ORM Сущность пользовательского профиля
@@ -47,9 +48,27 @@ public class UserProfileEntity implements IUser {
 
     @Override
     public String toString() {
-        return "UserDataSet{" +
+        return "UserProfileEntity{" +
                "id=" + id +
                ", name='" + login + '\'' +
                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserProfileEntity that = (UserProfileEntity) o;
+        return Objects.equals(id, that.id) &&
+               Objects.equals(login, that.login);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, login);
     }
 }

@@ -51,4 +51,9 @@ public class HashMapAccountServiceImpl implements IAccountService {
     public void deleteSession(String sessionId) {
         sessionIdToProfile.remove(sessionId);
     }
+
+    @Override
+    public Boolean isUserOnline(IUser user) {
+        return sessionIdToProfile.containsValue(user);
+    }
 }

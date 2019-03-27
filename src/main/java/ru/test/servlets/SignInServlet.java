@@ -1,8 +1,10 @@
 package ru.test.servlets;
 
+import ru.test.entities.ChatUser;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.AccountException;
 import ru.test.services.api.IAccountService;
+import ru.test.services.api.IChatService;
 import ru.test.utils.ContextService;
 import ru.test.utils.templater.PageGenerator;
 
@@ -18,7 +20,12 @@ public class SignInServlet extends HttpServlet {
 
     private final IAccountService accountService;
 
-    public SignInServlet() {this.accountService = ContextService.getInstance().getService(IAccountService.class);}
+    private final Boolean useChat;
+
+    public SignInServlet(Boolean useChat) {
+        this.accountService = ContextService.getInstance().getService(IAccountService.class);
+        this.useChat = useChat;
+    }
 
 
     public void doGet(HttpServletRequest request,
@@ -57,8 +64,13 @@ public class SignInServlet extends HttpServlet {
                 if (profile.getPassword().equals(pass)) {
                     accountService.addSession(req.getSession().getId(), profile);
                     pageVariables.put("username", login);
-                    resp.getWriter().println(
-                        PageGenerator.instance().getPage("chat.html", pageVariables));
+                    if(useChat) {
+                        IChatService service =
+                                ContextService.getInstance().getService(IChatService.class);
+                        service.sendChangeUserStatusMessage(new ChatUser(profile, true));
+                        resp.getWriter().println(
+                                PageGenerator.instance().getPage("chat.html", pageVariables));
+                    }
 
                 } else {
                     responseText = "Status code (401)\n" +
