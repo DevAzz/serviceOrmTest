@@ -106,13 +106,15 @@ body {
 }
 
 .usersBoxName {
-    width: min-content;
+    width: 50%;
     float: left;
+    text-align: center;
 }
 
 .usersBoxOnline {
-    width: min-content;
+    width: 50%;
     float: right;
+    text-align: center;
 }
 
 .usersBlock {

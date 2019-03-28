@@ -10,7 +10,7 @@
         var arrUsers = [];
 
         window.onbeforeunload = function () {
-            ws.close();
+            exit();
         };
 
         window.addEventListener('load', function (event) {
@@ -90,11 +90,15 @@
 
             };
             ws.onclose = function (event) {
-                var postUserOnline = new XMLHttpRequest();
-                postUserOnline.open("DELETE", "/account", true);
-                postUserOnline.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-                postUserOnline.send();
+
             }
+        }
+
+        function exit() {
+            var postUserOnline = new XMLHttpRequest();
+            postUserOnline.open("DELETE", "/account", true);
+            postUserOnline.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            postUserOnline.send();
         }
 
         function containsUser(user) {
@@ -152,7 +156,7 @@
             userBoxName.appendChild(document.createTextNode(userName));
 
             var userBoxOnline = document.createElement('div');
-            userBoxOnline.classList.add("usersBoxName");
+            userBoxOnline.classList.add("usersBoxOnline");
             userBoxOnline.appendChild(document.createTextNode(userOnline));
 
             userBox.append(userBoxName, userBoxOnline);
