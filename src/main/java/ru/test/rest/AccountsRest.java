@@ -1,4 +1,4 @@
-package ru.test.servlets;
+package ru.test.rest;
 
 import com.google.gson.GsonBuilder;
 import ru.test.entities.ChatUser;
@@ -7,44 +7,51 @@ import ru.test.exceptions.AccountException;
 import ru.test.services.api.IAccountService;
 import ru.test.utils.ContextService;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AccountsServlet extends HttpServlet {
+@Path("/account")
+public class AccountsRest {
 
     private final IAccountService accountService;
 
     private final GsonBuilder gsonBuilder;
 
-    public AccountsServlet() {
+    public AccountsRest() {
         this.accountService = ContextService.getInstance().getService(IAccountService.class);
         gsonBuilder = new GsonBuilder();
     }
 
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response) throws ServletException, IOException {
+    @GET
+    @Path("allUsers")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public String getAllUser() {
+        String result = "";
         try {
             List<IUser> users = accountService.getAllUsers();
             String jsonUsers = users.stream()
                     .map(user -> gsonBuilder.create()
                             .toJson(new ChatUser(user, accountService.isUserOnline(user)))).collect(
                             Collectors.joining(", "));
-            response.getOutputStream().write(("[" + jsonUsers + "]").getBytes("UTF-8"));
+            result = "[" + jsonUsers + "]";
         } catch (AccountException e) {
             e.printStackTrace();
             //TODO Логирование
         }
+        return result;
     }
 
-    public void doDelete(HttpServletRequest request,
-                       HttpServletResponse response) throws ServletException, IOException {
+    @POST
+    @Path("exitUser")
+    @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
+    public void handleUserExit(String name) {
         try {
-            accountService.deleteSession(request.getSession().getId());
+            accountService.deleteSession(name);
         } catch (AccountException e) {
             e.printStackTrace();
             //TODO Логирование

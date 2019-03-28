@@ -8,6 +8,7 @@
         var ws;
         var username = "${username}";
         var arrUsers = [];
+        var currentUser;
 
         window.onbeforeunload = function () {
             exit();
@@ -46,13 +47,14 @@
             ws = new WebSocket("ws://192.168.1.178:80/chat");
             ws.onopen = function (event) {
                 var getCurrentUserRequest = new XMLHttpRequest();
-                getCurrentUserRequest.open("GET", "/account", true);
+                getCurrentUserRequest.open("GET", "/account/allUsers", true);
                 getCurrentUserRequest.onload = function () {
                     arrUsers = parseJson(getCurrentUserRequest.responseText);
                     var usersBlock = document.getElementById("users");
                     usersBlock.innerHTML = '';
                     arrUsers.forEach(function (item, i, arr) {
                         if (username !== item.login) {
+                            currentUser = item;
                             showUser(item.login, item.online);
                         }
                     });
@@ -94,9 +96,9 @@
 
         function exit() {
             var postUserOnline = new XMLHttpRequest();
-            postUserOnline.open("DELETE", "/account", true);
+            postUserOnline.open("POST", "/account/exitUser", true);
             postUserOnline.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            postUserOnline.send();
+            postUserOnline.send(username);
         }
 
         function containsUser(user) {

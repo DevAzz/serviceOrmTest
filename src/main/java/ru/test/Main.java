@@ -1,6 +1,8 @@
 package ru.test;
 
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -11,7 +13,7 @@ import ru.test.services.ChatServiceImpl;
 import ru.test.services.DBAccountServiceImpl;
 import ru.test.services.DBServiceImpl;
 import ru.test.services.HashMapAccountServiceImpl;
-import ru.test.servlets.AccountsServlet;
+import ru.test.rest.AccountsRest;
 import ru.test.servlets.SignInServlet;
 import ru.test.servlets.SignUpServlet;
 import ru.test.servlets.WebSocketChatServlet;
@@ -33,9 +35,18 @@ public class Main {
         configServer();
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+
+        ServletHolder jerseyServlet = context.addServlet(
+                org.glassfish.jersey.servlet.ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
+
+        jerseyServlet.setInitParameter(
+                "jersey.config.server.provider.classnames",
+                AccountsRest.class.getCanonicalName());
+
         context.addServlet(new ServletHolder(new SignInServlet(useChat)), "/signin");
         context.addServlet(new ServletHolder(new SignUpServlet()), "/signup");
-        context.addServlet(new ServletHolder(new AccountsServlet()), "/account");
 
         if (useChat) {
             context.addServlet(new ServletHolder(new WebSocketChatServlet()), "/chat");
@@ -47,6 +58,8 @@ public class Main {
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[]{resource_handler, context});
+
+
 
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);

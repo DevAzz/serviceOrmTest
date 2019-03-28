@@ -58,7 +58,7 @@ public class DBAccountServiceImpl implements IAccountService {
     @Override
     public void addSession(String sessionId, IUser userProfileEntity) {
         System.out.println("Add user : " + userProfileEntity);
-        if(isUserOnline(userProfileEntity) && !sessionIdToProfile.containsKey(sessionId)) {
+        if (isUserOnline(userProfileEntity) && !sessionIdToProfile.containsKey(sessionId)) {
             sessionIdToProfile.forEach((k, v) -> {
                 if (userProfileEntity.equals(v)) {
                     sessionIdToProfile.remove(k, v);
@@ -71,8 +71,16 @@ public class DBAccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public void deleteSession(String sessionId) throws AccountException {
-        System.out.println("Delete user : " + sessionIdToProfile.get(sessionId));
+    public void deleteSession(String name) throws AccountException {
+        String sessionId = sessionIdToProfile.entrySet().stream().map(entry -> {
+            String result = null;
+            if (entry.getValue().getLogin().equals(name)) {
+                result = entry.getKey();
+            }
+            return result;
+        }).findFirst().orElse(null);
+        IUser user = getUserByLogin(name);
+        System.out.println("Delete user : " + user);
         sessionIdToProfile.remove(sessionId);
     }
 
