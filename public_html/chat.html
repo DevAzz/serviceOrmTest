@@ -82,8 +82,6 @@
                         }
                     });
                 } else {
-                    var usersBlock = document.getElementById("users");
-                    usersBlock.innerHTML = '';
                     showMessage(event.data.substring(event.data.indexOf(':') + 1),
                             messageHead, event.data.substring(0, event.data.indexOf(':')));
                 }

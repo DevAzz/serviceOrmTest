@@ -1,10 +1,8 @@
 package ru.test.servlets;
 
-import ru.test.entities.ChatUser;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.AccountException;
 import ru.test.services.api.IAccountService;
-import ru.test.services.api.IChatService;
 import ru.test.utils.ContextService;
 import ru.test.utils.templater.PageGenerator;
 
@@ -65,9 +63,6 @@ public class SignInServlet extends HttpServlet {
                     accountService.addSession(req.getSession().getId(), profile);
                     pageVariables.put("username", login);
                     if(useChat) {
-                        IChatService service =
-                                ContextService.getInstance().getService(IChatService.class);
-                        service.sendChangeUserStatusMessage(new ChatUser(profile, true));
                         resp.getWriter().println(
                                 PageGenerator.instance().getPage("chat.html", pageVariables));
                     }

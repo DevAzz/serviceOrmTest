@@ -16,6 +16,6 @@ public class WebSocketChatServlet extends WebSocketServlet {
     @Override
     public void configure(WebSocketServletFactory factory) {
         factory.getPolicy().setIdleTimeout(LOGOUT_TIME);
-        factory.setCreator((req, resp) -> new ChatWebSocket());
+        factory.setCreator((req, resp) -> new ChatWebSocket(req.getSession()));
     }
 }

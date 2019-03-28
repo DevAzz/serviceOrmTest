@@ -2,10 +2,7 @@ package ru.test.sockets;
 
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.api.annotations.*;
 import ru.test.entities.ChatUser;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.AccountException;
@@ -21,19 +18,20 @@ import java.util.stream.Collectors;
 public class ChatWebSocket {
     private IChatService chatService;
     private Session session;
+    private HttpSession httpSession;
     private IAccountService accountService;
     private IUser currentUser = null;
 
-    public ChatWebSocket() {
+    public ChatWebSocket(HttpSession httpSession) {
         this.chatService = ContextService.getInstance().getService(IChatService.class);
         accountService = ContextService.getInstance().getService(IAccountService.class);
+        this.httpSession = httpSession;
     }
 
     @OnWebSocketConnect
     public void onOpen(Session session) throws AccountException {
         chatService.add(this);
         this.session = session;
-        HttpSession httpSession = (HttpSession) session.getUpgradeRequest().getSession();
         currentUser = accountService.getUserBySessionId(httpSession.getId());
         String jsonUsers = accountService.getAllUsers().stream()
                         .map(user -> {
@@ -47,6 +45,7 @@ public class ChatWebSocket {
                         }).collect(
                         Collectors.joining(", "));
        sendString(MessageType.USER_LIST.getName() + "[" + jsonUsers + "]");
+       chatService.sendChangeUserStatusMessage(new ChatUser(currentUser, true));
     }
 
     @OnWebSocketMessage
@@ -58,6 +57,11 @@ public class ChatWebSocket {
     public void onClose(int statusCode, String reason) {
         chatService.sendChangeUserStatusMessage(new ChatUser(currentUser, false));
         chatService.remove(this);
+    }
+
+    @OnWebSocketError
+    public void onError(Session session, Throwable error) {
+        //error.printStackTrace();
     }
 
     public void sendString(String data) {

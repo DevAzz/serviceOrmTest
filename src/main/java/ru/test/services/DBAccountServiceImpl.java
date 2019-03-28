@@ -57,11 +57,22 @@ public class DBAccountServiceImpl implements IAccountService {
 
     @Override
     public void addSession(String sessionId, IUser userProfileEntity) {
+        System.out.println("Add user : " + userProfileEntity);
+        if(isUserOnline(userProfileEntity) && !sessionIdToProfile.containsKey(sessionId)) {
+            sessionIdToProfile.forEach((k, v) -> {
+                if (userProfileEntity.equals(v)) {
+                    sessionIdToProfile.remove(k, v);
+                    sessionIdToProfile.put(sessionId, userProfileEntity);
+                    return;
+                }
+            });
+        }
         sessionIdToProfile.put(sessionId, userProfileEntity);
     }
 
     @Override
     public void deleteSession(String sessionId) throws AccountException {
+        System.out.println("Delete user : " + sessionIdToProfile.get(sessionId));
         sessionIdToProfile.remove(sessionId);
     }
 
