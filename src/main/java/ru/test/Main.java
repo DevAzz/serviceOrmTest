@@ -7,19 +7,16 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import ru.test.repositories.JDBCUsersRepositoryImpl;
-import ru.test.repositories.ORMUsersRepositoryImpl;
+import ru.test.repositories.UsersRepository;
+import ru.test.rest.AccountsRest;
 import ru.test.services.ChatServiceImpl;
 import ru.test.services.DBAccountServiceImpl;
 import ru.test.services.DBServiceImpl;
 import ru.test.services.HashMapAccountServiceImpl;
-import ru.test.rest.AccountsRest;
 import ru.test.servlets.SignInServlet;
 import ru.test.servlets.SignUpServlet;
 import ru.test.servlets.WebSocketChatServlet;
 import ru.test.utils.ContextService;
-import ru.test.utils.DBInteratcionType;
-import ru.test.utils.DBTypes;
 import ru.test.utils.PropertiesType;
 
 import java.io.FileInputStream;
@@ -88,24 +85,10 @@ public class Main {
             if (useChat) {
                 ContextService.getInstance().addService(new ChatServiceImpl());
             }
-            DBInteratcionType dbInteraction =
-                    DBInteratcionType.valueOf(getPropertyValue(PropertiesType.DB_INTERACTION_TYPE));
             if (useDB) {
                 ContextService.getInstance().addService(new DBAccountServiceImpl());
                 ContextService.getInstance().addService(new DBServiceImpl());
-                DBTypes dbType =
-                        DBTypes.valueOf(getPropertyValue(PropertiesType.DB_TYPE));
-                switch (dbInteraction) {
-                    case ORM:
-                        ContextService.getInstance().addService(new ORMUsersRepositoryImpl());
-                        break;
-                    case JDBC:
-                        ContextService.getInstance()
-                                .addService(new JDBCUsersRepositoryImpl(dbType));
-                        break;
-                    default:
-                        break;
-                }
+                ContextService.getInstance().addService(new UsersRepository());
             } else {
                 ContextService.getInstance().addService(new HashMapAccountServiceImpl());
             }

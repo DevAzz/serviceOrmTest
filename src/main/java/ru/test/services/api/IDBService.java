@@ -26,7 +26,7 @@ public interface IDBService {
      * @return идентификатор пользователя
      * @throws DBException в случае ошибки
      */
-    long getUserId(String login) throws DBException;
+    Long getUserId(String login) throws DBException;
 
     /**
      * Возвращает пользователя по его логину

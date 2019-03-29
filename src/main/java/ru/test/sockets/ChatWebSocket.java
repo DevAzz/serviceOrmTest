@@ -68,6 +68,7 @@ public class ChatWebSocket {
         try {
             session.getRemote().sendString(data);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }

@@ -1,14 +1,16 @@
 package ru.test.services;
 
 import org.hibernate.HibernateException;
+import ru.test.entities.UserProfileEntity;
 import ru.test.entities.api.IUser;
 import ru.test.exceptions.DBException;
-import ru.test.repositories.api.IUsersRepository;
+import ru.test.repositories.UsersRepository;
 import ru.test.services.api.IDBService;
 import ru.test.utils.ContextService;
 
 import javax.persistence.NoResultException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса взаимодействия с БД на основе ORM
@@ -19,7 +21,7 @@ public class DBServiceImpl implements IDBService {
     public IUser getUser(long id) throws DBException {
         IUser user = null;
         try {
-            user = getRepository().get(id);
+            user = getRepository().getById(id);
         } catch (HibernateException e) {
             throw new DBException(e);
         }
@@ -27,10 +29,11 @@ public class DBServiceImpl implements IDBService {
     }
 
     @Override
-    public long getUserId(String login) throws DBException {
-        long id = 0L;
+    public Long getUserId(String login) throws DBException {
+        Long id = null;
         try {
-            id = getRepository().getUserId(login);
+            IUser user = getRepository().getUserByLogin(login);
+            id = null != user ? user.getId() : null;
         } catch (HibernateException e) {
             throw new DBException(e);
         }
@@ -54,7 +57,7 @@ public class DBServiceImpl implements IDBService {
     public Long addUser(String login, String password) throws DBException {
         Long id = null;
         try {
-            id = getRepository().addUser(login, password);
+            id = getRepository().add(new UserProfileEntity(login, password));
         } catch (HibernateException e) {
             throw new DBException(e);
         }
@@ -65,15 +68,16 @@ public class DBServiceImpl implements IDBService {
     public List<IUser> getAllUsers() throws DBException {
         List<IUser> result = null;
         try {
-            result = getRepository().getAllUsers();
+            result = getRepository().getAllEntities().stream().map(IUser.class::cast).collect(
+                    Collectors.toList());
         } catch (HibernateException e) {
             throw new DBException(e);
         }
         return result;
     }
 
-    private IUsersRepository getRepository() {
-        return ContextService.getInstance().getService(IUsersRepository.class);
+    private UsersRepository getRepository() {
+        return ContextService.getInstance().getService(UsersRepository.class);
     }
 
 }

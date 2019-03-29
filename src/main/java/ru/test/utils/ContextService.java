@@ -20,7 +20,11 @@ public class ContextService {
     }
 
     public void addService(Object service) {
-        serviceMap.put(service.getClass().getInterfaces()[0], service);
+        if (service.getClass().getInterfaces().length != 0) {
+            serviceMap.put(service.getClass().getInterfaces()[0], service);
+        } else {
+            serviceMap.put(service.getClass(), service);
+        }
     }
 
     public <T> T getService(Class<T> aServiceType) {
