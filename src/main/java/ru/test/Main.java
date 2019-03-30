@@ -7,12 +7,9 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import ru.test.repositories.ChatMessageRepository;
 import ru.test.repositories.UsersRepository;
-import ru.test.rest.AccountsRest;
-import ru.test.services.ChatServiceImpl;
-import ru.test.services.DBAccountServiceImpl;
-import ru.test.services.DBServiceImpl;
-import ru.test.services.HashMapAccountServiceImpl;
+import ru.test.services.*;
 import ru.test.servlets.SignInServlet;
 import ru.test.servlets.SignUpServlet;
 import ru.test.servlets.WebSocketChatServlet;
@@ -39,8 +36,8 @@ public class Main {
         jerseyServlet.setInitOrder(0);
 
         jerseyServlet.setInitParameter(
-                "jersey.config.server.provider.classnames",
-                AccountsRest.class.getCanonicalName());
+                "jersey.config.server.provider.packages",
+                "ru.test.rest");
 
         context.addServlet(new ServletHolder(new SignInServlet(useChat)), "/signin");
         context.addServlet(new ServletHolder(new SignUpServlet()), "/signup");
@@ -84,6 +81,8 @@ public class Main {
                     Boolean.parseBoolean(getPropertyValue(PropertiesType.USE_CHAT));
             if (useChat) {
                 ContextService.getInstance().addService(new ChatServiceImpl());
+                ContextService.getInstance().addService(new ChatMessageRepository());
+                ContextService.getInstance().addService(new ChatMessageServiceImpl());
             }
             if (useDB) {
                 ContextService.getInstance().addService(new DBAccountServiceImpl());

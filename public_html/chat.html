@@ -43,6 +43,23 @@
             });
         });
 
+        function getMessages() {
+            var getMessagesRequest = new XMLHttpRequest();
+            getMessagesRequest.open("GET", "/chatMessages/allMessages", true);
+            getMessagesRequest.onload = function () {
+                var messages = parseJson(getMessagesRequest.responseText);
+                var chatBox = document.getElementById('chatbox');
+                chatBox.innerHTML = '';
+                messages.forEach(function (item, i, arr) {
+                    var now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
+                    var messageHead = now + "\n";
+                    showMessage(item.text, messageHead, item.user.login);
+                });
+
+            };
+            getMessagesRequest.send(null);
+        }
+
         function init() {
             ws = new WebSocket("ws://192.168.1.178:80/chat");
             ws.onopen = function (event) {
@@ -60,7 +77,7 @@
                     });
                 };
                 getCurrentUserRequest.send(null);
-
+                getMessages();
             };
             ws.onmessage = function (event) {
                 var now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
@@ -167,7 +184,7 @@
         function sendMessage() {
             var messageField = document.getElementById("message");
             if (0 !== messageField.value.length) {
-                var message = username + ":" + messageField.value;
+                var message = messageField.value;
                 ws.send(message);
                 messageField.value = '';
             }

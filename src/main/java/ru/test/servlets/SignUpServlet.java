@@ -49,7 +49,7 @@ public class SignUpServlet extends HttpServlet {
                 pageVariables.put("username", login);
 
                 resp.getWriter().println(
-                        PageGenerator.instance().getPage("chat.html", pageVariables));
+                        PageGenerator.instance().getPage("signin.html", pageVariables));
             } else {
                 responseText = "Status code (200)\n" +
                                "и текст страницы:\n" +

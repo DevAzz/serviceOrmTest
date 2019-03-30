@@ -9,6 +9,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+import ru.test.entities.ChatMessageEntity;
 import ru.test.entities.UserProfileEntity;
 import ru.test.exceptions.DBException;
 
@@ -43,66 +44,59 @@ public abstract class AbstractRepository<T> {
      * @throws DBException в случае ошибки
      */
     public T getById(long id) throws DBException {
-        T entity = null;
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            entity = session.get(getEntityType(), id);
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-        return entity;
+        return executeResultHundler(session -> session.get(getEntityType(), id));
     }
 
-    public long add(T aEntity) throws DBException {
-        Long result = null;
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            result = (Long) session.save(aEntity);
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-        return result;
+    public Long add(T aEntity) throws DBException {
+        return executeResultHundler(session -> (Long) session.save(aEntity));
+    }
+
+    public void  update(T aEntity)throws DBException {
+        executeCallback(session -> session.update(aEntity));
     }
 
     public List<T> getAllEntities() throws DBException {
-        List<T> result = null;
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
+        return executeResultHundler(session -> {
             EntityManager em = session.getEntityManagerFactory().createEntityManager();
             CriteriaBuilder builder = em.getCriteriaBuilder();
             CriteriaQuery<T> criteria =
                     builder.createQuery(getEntityType());
             Root<T> root = criteria.from(getEntityType());
             criteria.select(root);
-            result = em.createQuery(criteria).getResultList().stream().map(getEntityType()::cast)
+            return em.createQuery(criteria).getResultList().stream().map(getEntityType()::cast)
                     .collect(
                             Collectors.toList());
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-        return result;
+        });
     }
 
-
-    public void removeEntity(T aEntity) throws DBException {
+    protected  <Type> Type executeResultHundler(ResultHandler<Type> handler) throws DBException {
+        Type value = null;
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
-            session.remove(aEntity);
+            value = handler.handle(session);
             transaction.commit();
             session.close();
         } catch (HibernateException e) {
             throw new DBException(e);
         }
+        return value;
+    }
+
+    protected void executeCallback(Callback callback) throws DBException {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+            callback.callingBack(session);
+            transaction.commit();
+            session.close();
+        } catch (HibernateException e) {
+            throw new DBException(e);
+        }
+    }
+
+    public void removeEntity(T aEntity) throws DBException {
+        executeCallback(session -> session.remove(aEntity));
     }
 
     protected void printConnectInfo() {
@@ -127,6 +121,7 @@ public abstract class AbstractRepository<T> {
 
         Metadata metadata = new MetadataSources(standardRegistry)
                 .addAnnotatedClass(UserProfileEntity.class)
+                .addAnnotatedClass(ChatMessageEntity.class)
                 .buildMetadata();
 
         return metadata.getSessionFactoryBuilder().build();
