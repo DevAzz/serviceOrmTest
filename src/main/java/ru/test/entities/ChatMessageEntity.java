@@ -16,9 +16,15 @@ public class ChatMessageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Автор сообщения */
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserProfileEntity user;
+    @JoinColumn(name = "author_id")
+    private UserProfileEntity author;
+
+    /** Адресат сообщения */
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private UserProfileEntity receiver;
 
     @Column(name = "date")
     private Date date;
@@ -30,8 +36,8 @@ public class ChatMessageEntity {
     public ChatMessageEntity() {
     }
 
-    public ChatMessageEntity(UserProfileEntity user, Date date, String text) {
-        this.user = user;
+    public ChatMessageEntity(UserProfileEntity author, Date date, String text) {
+        this.author = author;
         this.date = date;
         this.text = text;
     }
@@ -44,12 +50,12 @@ public class ChatMessageEntity {
         this.id = id;
     }
 
-    public UserProfileEntity getUser() {
-        return user;
+    public UserProfileEntity getAuthor() {
+        return author;
     }
 
-    public void setUser(UserProfileEntity user) {
-        this.user = user;
+    public void setAuthor(UserProfileEntity author) {
+        this.author = author;
     }
 
     public Date getDate() {

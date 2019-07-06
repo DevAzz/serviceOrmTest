@@ -13,4 +13,19 @@ public interface IChatMessageService {
 
     List<ChatMessageEntity> getAll() throws DBException;
 
+    /**
+     * Возвращает сообщение по идентифтикатору
+     * @param id идентификатор сообщения
+     * @return список сообщений
+     * @exception DBException в случае ошибки работы с БД
+     */
+    ChatMessageEntity getById(Long id) throws DBException;
+
+    /**
+     * Возвращает список сообщений по идентификатору пользователя
+     * @param userId идентификатор пользователя
+     * @return список пользовательских сообщений
+     * @throws DBException в случае ошибки работы с БД
+     */
+    List<ChatMessageEntity> getMessagesByUserId(Long userId) throws DBException;
 }

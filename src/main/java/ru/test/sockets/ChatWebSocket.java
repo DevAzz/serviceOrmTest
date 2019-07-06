@@ -61,7 +61,7 @@ public class ChatWebSocket {
             ChatMessageEntity messageEntity = new ChatMessageEntity();
             messageEntity.setDate(new Date());
             messageEntity.setText(data);
-            messageEntity.setUser((UserProfileEntity) currentUser);
+            messageEntity.setAuthor((UserProfileEntity) currentUser);
 
             messageService.addChatMessage(messageEntity);
 

@@ -75,7 +75,6 @@ public class Main {
         try (FileInputStream input = new FileInputStream("src/main/resources/config.properties")) {
             prop.load(input);
             boolean useDB =
-
                     Boolean.parseBoolean(getPropertyValue(PropertiesType.USE_DB));
             useChat =
                     Boolean.parseBoolean(getPropertyValue(PropertiesType.USE_CHAT));
