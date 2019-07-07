@@ -3,6 +3,8 @@ package ru.test.entities;
 import ru.test.entities.api.IUser;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,6 +24,15 @@ public class UserProfileEntity implements IUser {
 
     @Column(name = "password", unique = true, updatable = false)
     private String password;
+
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_chat",
+               //foreign key for EmployeeEntity in employee_car table
+               joinColumns = @JoinColumn(name = "user_id"),
+               //foreign key for other side - EmployeeEntity in employee_car table
+               inverseJoinColumns = @JoinColumn(name = "chat_id"))
+    private List<ChatEntity> chats = new ArrayList<>();
 
     public UserProfileEntity() {
     }
@@ -44,6 +55,18 @@ public class UserProfileEntity implements IUser {
     @Override
     public Long getId() {
         return id;
+    }
+
+    public List<ChatEntity> getChats() {
+        return chats;
+    }
+
+    public void setChats(List<ChatEntity> chats) {
+        this.chats = chats;
+    }
+
+    public void addChat(ChatEntity entity) {
+        this.chats.add(entity);
     }
 
     @Override

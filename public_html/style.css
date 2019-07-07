@@ -111,6 +111,11 @@ body {
     text-align: center;
 }
 
+.commonChatBoxName {
+    width: 100%;
+    text-align: center;
+}
+
 .usersBoxOnline {
     width: 50%;
     float: right;
@@ -121,4 +126,6 @@ body {
     width: 100%;
     height: 100%;
 }
+
+.usersBlock div:hover {background: #0078BF; color: #fff;}
 

@@ -38,6 +38,12 @@ public class HashMapAccountServiceImpl implements IAccountService {
     }
 
     @Override
+    public IUser getById(Long id) throws AccountException {
+        return loginToProfile.values().stream().filter(user -> user.getId().equals(id)).findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public IUser getUserBySessionId(String sessionId) {
         return sessionIdToProfile.get(sessionId);
     }

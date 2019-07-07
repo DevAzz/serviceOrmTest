@@ -9,6 +9,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+import ru.test.entities.ChatEntity;
 import ru.test.entities.ChatMessageEntity;
 import ru.test.entities.UserProfileEntity;
 import ru.test.exceptions.DBException;
@@ -122,6 +123,7 @@ public abstract class AbstractRepository<T> {
         Metadata metadata = new MetadataSources(standardRegistry)
                 .addAnnotatedClass(UserProfileEntity.class)
                 .addAnnotatedClass(ChatMessageEntity.class)
+                .addAnnotatedClass(ChatEntity.class)
                 .buildMetadata();
 
         return metadata.getSessionFactoryBuilder().build();

@@ -17,6 +17,8 @@ import ru.test.utils.MessageType;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @WebSocket
@@ -42,7 +44,7 @@ public class ChatWebSocket {
         currentUser = accountService.getUserBySessionId(httpSession.getId());
         String jsonUsers = accountService.getAllUsers().stream()
                         .map(user -> {
-                            String result = "";
+                            String result = null;
                             if (user.getId() != currentUser.getId()) {
                                 result = new GsonBuilder().create()
                                         .toJson(new ChatUser(user,
@@ -56,13 +58,26 @@ public class ChatWebSocket {
     }
 
     @OnWebSocketMessage
-    public void onMessage(String data) {
+    public void onMessage(String data) throws AccountException{
         try {
             ChatMessageEntity messageEntity = new ChatMessageEntity();
             messageEntity.setDate(new Date());
-            messageEntity.setText(data);
             messageEntity.setAuthor((UserProfileEntity) currentUser);
-
+            Pattern pattern = Pattern.compile("^receiver=\\d:.+$");
+            Matcher matcher = pattern.matcher(data);
+            if (matcher.find()) {
+                try {
+                    Long receiverId = Long.parseLong(data.substring(data.indexOf('=') + 1,
+                                                                    data.indexOf(':')));
+                    messageEntity
+                            .setReceiver((UserProfileEntity) accountService.getById(receiverId));
+                    data = data.substring(data.indexOf(':') + 1);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    //TODO Логирование
+                }
+            }
+            messageEntity.setText(data);
             messageService.addChatMessage(messageEntity);
 
             chatService.sendMessage(currentUser.getLogin() + ":" + data);

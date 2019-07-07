@@ -51,6 +51,17 @@ public class DBAccountServiceImpl implements IAccountService {
     }
 
     @Override
+    public IUser getById(Long id) throws AccountException {
+        IUser result = null;
+        try {
+            result = getDBService().getUser(id);
+        } catch (DBException e) {
+            throw new AccountException(e);
+        }
+        return result;
+    }
+
+    @Override
     public IUser getUserBySessionId(String sessionId) {
         return sessionIdToProfile.get(sessionId);
     }

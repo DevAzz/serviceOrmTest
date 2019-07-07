@@ -74,6 +74,13 @@ public class ChatMessageEntity {
         this.text = text;
     }
 
+    public UserProfileEntity getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(UserProfileEntity receiver) {
+        this.receiver = receiver;
+    }
 
     @Override
     public boolean equals(Object o) {

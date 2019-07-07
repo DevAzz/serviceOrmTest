@@ -1,25 +1,26 @@
-var ws;
-var username = "${username}";
-var arrUsers = [];
-var currentUser;
+let ws;
+let username = document.getElementById("chatScript").src.toLowerCase();
+let arrUsers = [];
+let receiver;
+let currentUser;
 
 window.onbeforeunload = function () {
     exit();
 };
 
 window.addEventListener('load', function (event) {
-    var textArea = document.querySelectorAll(".messageInputTextArea");
+    let textArea = document.querySelectorAll(".messageInputTextArea");
     [].forEach.call(textArea, function (el) {
         el.addEventListener('keydown', function (e) {
             if ((e.keyCode === 10 || e.keyCode === 13) && e.ctrlKey) {
                 sendMessage();
             } else if (e.keyCode === 9) { // tab was pressed
                 // get caret position/selection
-                var start = this.selectionStart;
-                var end = this.selectionEnd;
+                let start = this.selectionStart;
+                let end = this.selectionEnd;
 
-                var target = e.target;
-                var value = target.value;
+                let target = e.target;
+                let value = target.value;
 
                 // set textarea value to: text before caret + tab + text after caret
                 target.value = value.substring(0, start)
@@ -36,16 +37,35 @@ window.addEventListener('load', function (event) {
     });
 });
 
-function getMessages() {
-    var getMessagesRequest = new XMLHttpRequest();
+function getAllMessages() {
+    receiver = undefined;
+    let getMessagesRequest = new XMLHttpRequest();
     getMessagesRequest.open("GET", "/chatMessages/allMessages", true);
     getMessagesRequest.onload = function () {
-        var messages = parseJson(getMessagesRequest.responseText);
-        var chatBox = document.getElementById('chatbox');
+        let messages = parseJson(getMessagesRequest.responseText);
+        let chatBox = document.getElementById('chatbox');
         chatBox.innerHTML = '';
         messages.forEach(function (item, i, arr) {
-            var now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
-            var messageHead = now + "\n";
+            let now = moment(item.date).format('DD-MM-YYYY HH:mm:ss');
+            let messageHead = now + "\n";
+            showMessage(item.text, messageHead, item.author.login);
+        });
+
+    };
+    getMessagesRequest.send(null);
+}
+
+function getMessagesByUserId(authorId, receiverId) {
+    receiver = receiverId;
+    let getMessagesRequest = new XMLHttpRequest();
+    getMessagesRequest.open("GET", "/chatMessages/messagesByUserId/" + authorId + "/" + receiverId, true);
+    getMessagesRequest.onload = function () {
+        let messages = parseJson(getMessagesRequest.responseText);
+        let chatBox = document.getElementById('chatbox');
+        chatBox.innerHTML = '';
+        messages.forEach(function (item, i, arr) {
+            let now = moment(item.date).format('DD-MM-YYYY HH:mm:ss');
+            let messageHead = now + "\n";
             showMessage(item.text, messageHead, item.author.login);
         });
 
@@ -56,29 +76,32 @@ function getMessages() {
 function init() {
     ws = new WebSocket("ws://127.0.0.1:80/chat");
     ws.onopen = function (event) {
-        var getCurrentUserRequest = new XMLHttpRequest();
+        username = username.substring(username.indexOf('=') + 1);
+        let getCurrentUserRequest = new XMLHttpRequest();
         getCurrentUserRequest.open("GET", "/account/allUsers", true);
         getCurrentUserRequest.onload = function () {
             arrUsers = parseJson(getCurrentUserRequest.responseText);
-            var usersBlock = document.getElementById("users");
+            let usersBlock = document.getElementById("users");
             usersBlock.innerHTML = '';
+            showCommonChatElement();
             arrUsers.forEach(function (item, i, arr) {
                 if (username !== item.login) {
+                    showUser(item);
+                } else {
                     currentUser = item;
-                    showUser(item.login, item.online);
                 }
             });
         };
         getCurrentUserRequest.send(null);
-        getMessages();
+        getAllMessages();
     };
     ws.onmessage = function (event) {
-        var now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
-        var messageHead = now + "\n";
+        let now = moment(new Date()).format('DD-MM-YYYY HH:mm:ss');
+        let messageHead = now + "\n";
         if (event.data.indexOf('USER_LIST') + 1) {
-            var changeUsers = parseJson(event.data.substring(9, event.data.length));
+            let changeUsers = parseJson(event.data.substring(9, event.data.length));
             changeUsers.forEach(function (item, i, arr) {
-                if (username !== item.login) {
+                if (item !== null && username !== item.login) {
                     if (containsUser(item)) {
                         arrUsers[getUserIndex(item)] = item;
                     } else {
@@ -86,11 +109,12 @@ function init() {
                     }
                 }
             });
-            var usersBlock = document.getElementById("users");
+            let usersBlock = document.getElementById("users");
             usersBlock.innerHTML = '';
+            showCommonChatElement();
             arrUsers.forEach(function (item, i, arr) {
-                if (username !== item.login) {
-                    showUser(item.login, item.online);
+                if (item !== null && username !== item.login) {
+                    showUser(item);
                 }
             });
         } else {
@@ -100,20 +124,19 @@ function init() {
 
     };
     ws.onclose = function (event) {
-
     }
 }
 
 function exit() {
-    var postUserOnline = new XMLHttpRequest();
+    let postUserOnline = new XMLHttpRequest();
     postUserOnline.open("POST", "/account/exitUser", true);
     postUserOnline.setRequestHeader('Content-type', 'application/json; charset=utf-8');
     postUserOnline.send(username);
 }
 
 function containsUser(user) {
-    var result = false;
-    var BreakException = {};
+    let result = false;
+    let BreakException = {};
     try {
         arrUsers.forEach(function (item, i, arr) {
             if (item.login === user.login) {
@@ -128,8 +151,8 @@ function containsUser(user) {
 }
 
 function getUserIndex(user) {
-    var result = -1;
-    var BreakException = {};
+    let result = -1;
+    let BreakException = {};
     try {
         arrUsers.forEach(function (item, i, arr) {
             if (item.login === user.login) {
@@ -144,7 +167,7 @@ function getUserIndex(user) {
 }
 
 function parseJson(json) {
-    var string = json.replace(/\\n/g, "\\n")
+    let string = json.replace(/\\n/g, "\\n")
         .replace(/\\'/g, "\\'")
         .replace(/\\"/g, '\\"')
         .replace(/\\&/g, "\\&")
@@ -156,28 +179,49 @@ function parseJson(json) {
     return JSON.parse(string);
 }
 
-function showUser(userName, userOnline) {
-    var usersBlock = document.getElementById("users");
-    var userBox = document.createElement('div');
+function showUser(user) {
+    let usersBlock = document.getElementById("users");
+    let userBox = document.createElement('div');
     userBox.classList.add('usersBox');
 
-    var userBoxName = document.createElement('div');
+    let userBoxName = document.createElement('div');
     userBoxName.classList.add("usersBoxName");
-    userBoxName.appendChild(document.createTextNode(userName));
+    userBoxName.appendChild(document.createTextNode(user.login));
 
-    var userBoxOnline = document.createElement('div');
+    let userBoxOnline = document.createElement('div');
     userBoxOnline.classList.add("usersBoxOnline");
-    userBoxOnline.appendChild(document.createTextNode(userOnline));
+    userBoxOnline.appendChild(document.createTextNode(user.online));
 
     userBox.append(userBoxName, userBoxOnline);
+    userBox.onclick = function () {
+        return getMessagesByUserId(currentUser.id, user.id);
+    };
+    usersBlock.appendChild(userBox);
+
+}
+
+function showCommonChatElement() {
+    let usersBlock = document.getElementById("users");
+    let userBox = document.createElement('div');
+    userBox.classList.add('usersBox');
+
+    let commonChatBoxName = document.createElement('div');
+    commonChatBoxName.classList.add("commonChatBoxName");
+    commonChatBoxName.appendChild(document.createTextNode("Общий чат"));
+
+    userBox.append(commonChatBoxName);
+    userBox.onclick = getAllMessages;
     usersBlock.appendChild(userBox);
 
 }
 
 function sendMessage() {
-    var messageField = document.getElementById("message");
+    let messageField = document.getElementById("message");
     if (0 !== messageField.value.length) {
-        var message = messageField.value;
+        let message = messageField.value;
+        if (receiver !== undefined) {
+            message = "receiver=" + receiver + ":" + messageField.value;
+        }
         ws.send(message);
         messageField.value = '';
     }
@@ -185,17 +229,17 @@ function sendMessage() {
 }
 
 function showMessage(message, messageHeadValue, username) {
-    var messageBox = document.createElement('div');
+    let messageBox = document.createElement('div');
     messageBox.classList.add('messageBox');
 
-    var messageHead = document.createElement('div');
+    let messageHead = document.createElement('div');
     messageHead.classList.add('messageHead');
 
-    var messageHeadTime = document.createElement('div');
+    let messageHeadTime = document.createElement('div');
     messageHeadTime.classList.add('messageHeadTime');
     messageHeadTime.appendChild(document.createTextNode(messageHeadValue));
 
-    var messageUser = document.createElement('div');
+    let messageUser = document.createElement('div');
     messageUser.classList.add('messageHeadUserName');
     messageUser.appendChild(document.createTextNode(username));
 
@@ -203,9 +247,9 @@ function showMessage(message, messageHeadValue, username) {
 
     messageBox.appendChild(messageHead);
 
-    var messageElem = document.createElement('div');
+    let messageElem = document.createElement('div');
     messageElem.classList.add('messageValue');
-    var pre = document.createElement('pre');
+    let pre = document.createElement('pre');
     pre.classList.add('formatBox');
     pre.appendChild(document.createTextNode(message));
     messageElem.appendChild(pre);

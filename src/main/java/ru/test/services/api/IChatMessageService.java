@@ -24,8 +24,16 @@ public interface IChatMessageService {
     /**
      * Возвращает список сообщений по идентификатору пользователя
      * @param userId идентификатор пользователя
+     * @param receiverId идентификатор адресата сообщения
      * @return список пользовательских сообщений
      * @throws DBException в случае ошибки работы с БД
      */
-    List<ChatMessageEntity> getMessagesByUserId(Long userId) throws DBException;
+    List<ChatMessageEntity> getMessagesByUserId(Long userId, Long receiverId) throws DBException;
+
+    /**
+     * Возвращает список общих сообщений
+     * @return список общих сообщений
+     * @throws DBException в случае ошибки
+     */
+    List<ChatMessageEntity> getCommonMessages() throws DBException;
 }

@@ -37,8 +37,13 @@ public class ChatMessageServiceImpl implements IChatMessageService {
     }
 
     @Override
-    public List<ChatMessageEntity> getMessagesByUserId(Long userId) throws DBException {
-        return repository.getMessagesByUserId(userId);
+    public List<ChatMessageEntity> getMessagesByUserId(Long userId, Long receiverId) throws DBException {
+        return repository.getMessagesByUserId(userId,receiverId);
+    }
+
+    @Override
+    public List<ChatMessageEntity> getCommonMessages() throws DBException {
+        return repository.getCommonMessages();
     }
 
 }

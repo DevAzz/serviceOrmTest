@@ -18,6 +18,14 @@ public interface IAccountService {
      */
     List<IUser> getAllUsers() throws AccountException;
 
+    /**
+     * Возвращает пользователя по его идентификатору
+     * @param id идентификатор пользоватетля
+     * @return пользователь
+     * @throws AccountException в случае ошибки
+     */
+    IUser getById(Long id)  throws AccountException;
+
     IUser getUserBySessionId(String sessionId) throws AccountException;
 
     void addSession(String sessionId, IUser userProfileEntity) throws AccountException;
